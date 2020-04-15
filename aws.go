@@ -1,4 +1,4 @@
-package common_lib
+package commonLib
 
 import (
 	"github.com/aws/aws-sdk-go/aws"

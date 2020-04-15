@@ -1,4 +1,4 @@
-module src.doom.fm/schism/common-lib
+module src.doom.fm/schism/commonLib
 
 go 1.14
 
