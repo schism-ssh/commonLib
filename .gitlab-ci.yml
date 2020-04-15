@@ -1,0 +1,34 @@
+default:
+  image: img.doom.fm/build/golang:latest-1.14.2-buster
+  tags:
+    - schism-ci-cd
+
+stages:
+  - pre-flight
+  - testing
+
+.go-cache:
+  cache:
+    key:
+      files:
+        - go.sum
+      prefix: "${CI_COMMIT_REF_SLUG}"
+    paths:
+      - vendor/
+
+go-fmt-vet:
+  stage: pre-flight
+  extends:
+    - .go-cache
+  before_script:
+    - go mod vendor
+  script:
+    - go fmt ./...
+    - go vet ./...
+
+go-test-cover:
+  stage: testing
+  extends:
+    - .go-cache
+  script:
+    - go test -cover -test.v ./...
