@@ -1,6 +1,6 @@
 package protocol
 
-type RequestSignedCertificateLambdaPayload struct {
+type RequestSSHCertLambdaPayload struct {
 	CertificateType  string   `json:"certificate_type"`
 	Identity         string   `json:"certificate_identity"`
 	Principals       []string `json:"certificate_principals"`
@@ -8,7 +8,7 @@ type RequestSignedCertificateLambdaPayload struct {
 	PublicKey        string   `json:"public_key"`
 }
 
-type RequestSignedCertificateLambdaResponse struct {
+type RequestSSHCertLambdaResponse struct {
 	LookupKey string `json:"lookup_key"`
 }
 
