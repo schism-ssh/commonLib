@@ -21,5 +21,6 @@ type SignedCertificateS3Object struct {
 	Principals                  []string          `json:"certificate_principals"`
 	ValidityInterval            string            `json:"validity_interval"`
 	RawSignedCertificate        string            `json:"signed_certificate"`
+	OppositePublicCA            string            `json:"opposite_public_ca"`
 	SignedCertificateEncryption map[string]string `json:"signed_certificate_encryption,omitempty"`
 }
