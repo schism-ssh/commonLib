@@ -1,5 +1,10 @@
 package protocol
 
+const (
+	HostCertificate = "host"
+	UserCertificate = "user"
+)
+
 type RequestSSHCertLambdaPayload struct {
 	CertificateType  string   `json:"certificate_type"`
 	Identity         string   `json:"certificate_identity"`
