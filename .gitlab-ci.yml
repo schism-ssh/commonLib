@@ -7,28 +7,22 @@ stages:
   - pre-flight
   - testing
 
-.go-cache:
-  cache:
-    key:
-      files:
-        - go.mod
-      prefix: "${CI_COMMIT_REF_SLUG}"
-    paths:
-      - vendor/
-
 go-fmt-vet:
   stage: pre-flight
-  extends:
-    - .go-cache
   before_script:
     - go mod vendor
   script:
     - go fmt ./...
     - go vet ./...
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - vendor/
 
 go-test-cover:
   stage: testing
-  extends:
-    - .go-cache
   script:
-    - go test -cover -test.v ./...
+    - go test -cover -coverprofile cover.out ./...
+    - go tool cover -func cover.out | awk '/total:/ {print $1" "$2" "$3}; /.go/{print $0}'
+  dependencies:
+    - go-fmt-vet
