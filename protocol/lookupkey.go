@@ -1,4 +1,4 @@
-package commonLib
+package protocol
 
 import (
 	"crypto/sha256"
@@ -7,9 +7,11 @@ import (
 	"strings"
 )
 
-func LookupKey(ident string, principals []string) string {
+type LookupKey string
+
+func GenerateLookupKey(ident string, principals []string) LookupKey {
 	sort.Strings(principals)
 	lookupList := append([]string{ident}, principals...)
 	lookupString := strings.Join(lookupList, ",")
-	return fmt.Sprintf("%x", sha256.Sum256([]byte(lookupString)))
+	return LookupKey(fmt.Sprintf("%x", sha256.Sum256([]byte(lookupString))))
 }
