@@ -1,7 +1,7 @@
 default:
   image: img.doom.fm/build/golang:latest-1.14.2-buster
   tags:
-    - schism-ci-cd
+    - shared-exec-docker
 
 stages:
   - pre-flight
