@@ -1,18 +1,19 @@
 package protocol
 
+import "time"
+
 const (
 	HostCertificate = "host"
 	UserCertificate = "user"
 )
 
 type RequestSSHCertLambdaPayload struct {
-	CertificateType  string   `json:"certificate_type"`
-	Identity         string   `json:"certificate_identity"`
-	Principals       []string `json:"certificate_principals"`
-	ValidityInterval string   `json:"validity_interval"`
-	UserKeyOptions   []string `json:"user_key_options,omitempty"`
-	SerialNumber     string   `json:"serial_number,omitempty"`
-	PublicKey        string   `json:"public_key"`
+	CertificateType  string        `json:"certificate_type"`
+	Identity         string        `json:"certificate_identity"`
+	Principals       []string      `json:"certificate_principals"`
+	ValidityInterval time.Duration `json:"validity_interval"`
+	UserKeyOptions   []string      `json:"user_key_options,omitempty"`
+	PublicKey        string        `json:"public_key"`
 }
 
 type RequestSSHCertLambdaResponse struct {
