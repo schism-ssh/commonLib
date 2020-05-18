@@ -6,7 +6,7 @@ var prefix = "schism-test/"
 
 func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
 	type fields struct {
-		CertificateType    string
+		CertificateType    CertType
 		HostCertAuthDomain string
 	}
 	type args struct {
@@ -55,9 +55,9 @@ func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
 
 func TestSignedCertificateS3Object_ObjectKey(t *testing.T) {
 	type fields struct {
-		CertificateType             string
-		Identity                    string
-		Principals                  []string
+		CertificateType CertType
+		Identity        string
+		Principals      []string
 	}
 	type args struct {
 		prefix string
@@ -96,12 +96,38 @@ func TestSignedCertificateS3Object_ObjectKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &SignedCertificateS3Object{
-				CertificateType:             tt.fields.CertificateType,
-				Identity:                    tt.fields.Identity,
-				Principals:                  tt.fields.Principals,
+				CertificateType: tt.fields.CertificateType,
+				Identity:        tt.fields.Identity,
+				Principals:      tt.fields.Principals,
 			}
 			if got := c.ObjectKey(tt.args.prefix); got != tt.want {
 				t.Errorf("ObjectKey() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCertType_OppositeCA(t *testing.T) {
+	tests := []struct {
+		name string
+		ct   CertType
+		want CertType
+	}{
+		{
+			name: "Host yields User",
+			ct:   UserCertificate,
+			want: HostCertificate,
+		},
+		{
+			name: "User yields Host",
+			ct:   HostCertificate,
+			want: UserCertificate,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.ct.OppositeCA(); got != tt.want {
+				t.Errorf("OppositeCA() = %v, want %v", got, tt.want)
 			}
 		})
 	}

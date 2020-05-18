@@ -5,13 +5,22 @@ import (
 	"time"
 )
 
+type CertType string
+
 const (
-	HostCertificate = "host"
-	UserCertificate = "user"
+	HostCertificate CertType = "host"
+	UserCertificate          = "user"
 )
 
+func (ct CertType) OppositeCA() CertType {
+	return (map[CertType]CertType{
+		HostCertificate: UserCertificate,
+		UserCertificate: HostCertificate,
+	})[ct]
+}
+
 type RequestSSHCertLambdaPayload struct {
-	CertificateType  string        `json:"certificate_type"`
+	CertificateType  CertType      `json:"certificate_type"`
 	Identity         string        `json:"certificate_identity"`
 	Principals       []string      `json:"certificate_principals"`
 	ValidityInterval time.Duration `json:"validity_interval"`
@@ -28,12 +37,12 @@ type S3Object interface {
 }
 
 type SignedCertificateS3Object struct {
-	CertificateType             string            `json:"certificate_type"`
-	IssuedOn                    string            `json:"issued_on"`
+	CertificateType             CertType          `json:"certificate_type"`
+	IssuedOn                    time.Time         `json:"issued_on"`
 	Identity                    string            `json:"identity"`
 	Principals                  []string          `json:"certificate_principals"`
-	ValidityInterval            string            `json:"validity_interval"`
-	RawSignedCertificate        string            `json:"signed_certificate"`
+	ValidityInterval            time.Duration     `json:"validity_interval"`
+	RawSignedCertificate        []byte            `json:"signed_certificate"`
 	OppositePublicCA            string            `json:"opposite_public_ca"`
 	SignedCertificateEncryption map[string]string `json:"signed_certificate_encryption,omitempty"`
 }
@@ -44,9 +53,9 @@ func (c *SignedCertificateS3Object) ObjectKey(prefix string) string {
 }
 
 type CAPublicKeyS3Object struct {
-	CertificateType    string `json:"certificate_type"`
-	AuthorizedKey      []byte `json:"authorized_key"`
-	HostCertAuthDomain string `json:"host_cert_auth_domain,omitempty"`
+	CertificateType    CertType `json:"certificate_type"`
+	AuthorizedKey      []byte   `json:"authorized_key"`
+	HostCertAuthDomain string   `json:"host_cert_auth_domain,omitempty"`
 }
 
 func (c *CAPublicKeyS3Object) ObjectKey(prefix string) string {
@@ -55,7 +64,7 @@ func (c *CAPublicKeyS3Object) ObjectKey(prefix string) string {
 	if c.HostCertAuthDomain != "" {
 		subKey = fmt.Sprintf("%s-%s", c.HostCertAuthDomain, c.CertificateType)
 	} else {
-		subKey = c.CertificateType
+		subKey = string(c.CertificateType)
 	}
 	return fmt.Sprintf("%s%s%s.json", prefix, objectPrefix, subKey)
 }
