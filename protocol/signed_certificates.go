@@ -9,7 +9,7 @@ type CertType string
 
 const (
 	HostCertificate CertType = "host"
-	UserCertificate          = "user"
+	UserCertificate CertType = "user"
 )
 
 func (ct CertType) OppositeCA() CertType {
