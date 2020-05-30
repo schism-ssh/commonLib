@@ -5,6 +5,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/lambda"
 	"github.com/aws/aws-sdk-go/service/lambda/lambdaiface"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/aws/aws-sdk-go/service/ssm/ssmiface"
 )
@@ -15,6 +17,10 @@ func SSMClient(region string) ssmiface.SSMAPI {
 
 func LambdaClient(region string) lambdaiface.LambdaAPI {
 	return lambda.New(AwsSession(region))
+}
+
+func S3Client(region string) s3iface.S3API {
+	return s3.New(AwsSession(region))
 }
 
 func AwsSession(region string) *session.Session {
