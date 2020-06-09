@@ -26,34 +26,6 @@ func (ct CertType) OppositeCA() CertType {
 	})[ct]
 }
 
-// RequestSSHCertLambdaPayload is used to pass the required information to the lambda function
-type RequestSSHCertLambdaPayload struct {
-	// Type of SSH-cert being requested.
-	//
-	// The following are accepted:
-	//    * "host"
-	//    * "user
-	CertificateType  CertType      `json:"certificate_type"`
-	// Specify the key identity when signing a public key.
-	Identity         string        `json:"certificate_identity"`
-	// Specify one or more principals (user or host names) to be included in a certificate when signing a key.
-	Principals       []string      `json:"certificate_principals"`
-	// Length of time the Signed Certificate will be valid for.
-	ValidityInterval time.Duration `json:"validity_interval"`
-	// Specify a certificate option when signing a key.
-	UserKeyOptions   []string      `json:"user_key_options,omitempty"`
-	// Public Key to submit to the CA for signing.
-	// Supported types: (Others may work, ymmv)
-	//
-	//    * "ed25519"
-	//    * "rsa"
-	PublicKey        string        `json:"public_key"`
-}
-
-type RequestSSHCertLambdaResponse struct {
-	LookupKey string `json:"lookup_key"`
-}
-
 type S3Object interface {
 	ObjectKey(prefix string) string
 }
