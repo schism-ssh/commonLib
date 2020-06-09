@@ -89,12 +89,12 @@ type CAPublicKeyS3Object struct {
 //
 //  Format:
 //   {prefix}CA-Certs/{host|user}.json
-//   {prefix}CA-Certs/{HostCertAuthDomain}-{host|user}.json
+//   {prefix}CA-Certs/{host|user}-{HostCertAuthDomain}.json
 func (c *CAPublicKeyS3Object) ObjectKey(prefix string) string {
 	objectPrefix := "CA-Certs/"
 	var subKey string
 	if c.HostCertAuthDomain != "" {
-		subKey = fmt.Sprintf("%s-%s", c.HostCertAuthDomain, c.CertificateType)
+		subKey = fmt.Sprintf("%s-%s", c.CertificateType, c.HostCertAuthDomain)
 	} else {
 		subKey = string(c.CertificateType)
 	}

@@ -20,24 +20,18 @@ func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
 	}{
 		{
 			name: "UserPublicCAS3ObjectKey",
-			fields: fields{
-				CertificateType:    UserCertificate,
-				HostCertAuthDomain: "*.example.com",
-			},
-			args: args{
-				prefix: prefix,
-			},
-			want: "schism-test/CA-Certs/*.example.com-user.json",
+			fields: fields{CertificateType: UserCertificate},
+			args: args{prefix: prefix},
+			want: "schism-test/CA-Certs/user.json",
 		},
 		{
 			name: "HostPublicCAS3ObjectKey",
 			fields: fields{
-				CertificateType: HostCertificate,
+				CertificateType:    HostCertificate,
+				HostCertAuthDomain: "example.com",
 			},
-			args: args{
-				prefix: prefix,
-			},
-			want: "schism-test/CA-Certs/host.json",
+			args: args{prefix: prefix},
+			want: "schism-test/CA-Certs/host-example.com.json",
 		},
 	}
 	for _, tt := range tests {
@@ -75,9 +69,7 @@ func TestSignedCertificateS3Object_ObjectKey(t *testing.T) {
 				Identity:        "test.example.com",
 				Principals:      []string{"test.example.com"},
 			},
-			args: args{
-				prefix: prefix,
-			},
+			args: args{prefix: prefix},
 			want: "schism-test/hosts/55e8182ec4413d51676d1ba7480708a48c5b50f4a86b3afb9be6c43c648b373d.json",
 		},
 		{
@@ -87,9 +79,7 @@ func TestSignedCertificateS3Object_ObjectKey(t *testing.T) {
 				Identity:        "user@test.example.com",
 				Principals:      []string{"user", "admin"},
 			},
-			args: args{
-				prefix: prefix,
-			},
+			args: args{prefix: prefix},
 			want: "schism-test/users/69206403b2f940935765c084335bcd2d9caed2fbd86a7056ddab98ce698e4ce1.json",
 		},
 	}
