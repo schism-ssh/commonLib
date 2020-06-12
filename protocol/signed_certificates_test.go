@@ -1,13 +1,19 @@
 package protocol
 
-import "testing"
+import (
+	"testing"
+)
 
 var prefix = "schism-test/"
 
 func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
+	sampleAuthKey := []byte("ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN6gR4rRcthrCNDgBdOHhJQD/7bS+RTt/+BtUqAZGMEa")
+	kFPrint := "SHA256:yCYTo2nP5zUcJuLWlHEJKj0jEElUE2wZvEMuh82UMQM"
 	type fields struct {
 		CertificateType    CertType
 		HostCertAuthDomain string
+		AuthorizedKey      []byte
+		KeyFingerprint     string
 	}
 	type args struct {
 		prefix string
@@ -19,19 +25,49 @@ func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
 		want   string
 	}{
 		{
-			name: "UserPublicCAS3ObjectKey",
+			name:   "User Public CA S3Object Key Without Fingerprint",
 			fields: fields{CertificateType: UserCertificate},
-			args: args{prefix: prefix},
-			want: "schism-test/CA-Certs/user.json",
+			args:   args{prefix: prefix},
+			want:   "schism-test/CA-Pubkeys/user.json",
 		},
 		{
-			name: "HostPublicCAS3ObjectKey",
+			name: "User Public CA S3Object Key With Fingerprint",
+			fields: fields{
+				CertificateType: UserCertificate,
+				KeyFingerprint:  kFPrint,
+			},
+			args: args{prefix: prefix},
+			want: "schism-test/CA-Pubkeys/user-yCYTo2nP5zUcJuLWlHEJKj0jEElUE2wZvEMuh82UMQM.json",
+		},
+		{
+			name: "Host Public CA S3Object Key Without AuthDomain Without Fingerprint",
+			fields: fields{
+				CertificateType: HostCertificate,
+				AuthorizedKey:   sampleAuthKey,
+			},
+			args: args{prefix: prefix},
+			want: "schism-test/CA-Pubkeys/host.json",
+		},
+		{
+			name: "Host Public CA S3Object Key With AuthDomain Without Fingerprint",
 			fields: fields{
 				CertificateType:    HostCertificate,
 				HostCertAuthDomain: "example.com",
+				AuthorizedKey:      sampleAuthKey,
 			},
 			args: args{prefix: prefix},
-			want: "schism-test/CA-Certs/host-example.com.json",
+			want: "schism-test/CA-Pubkeys/host-example.com.json",
+		},
+		{
+			name: "Host Public CA S3Object Key With AuthDomain With Fingerprint",
+			fields: fields{
+				CertificateType:    HostCertificate,
+				HostCertAuthDomain: "example.com",
+				AuthorizedKey:      sampleAuthKey,
+				KeyFingerprint:     kFPrint,
+			},
+			args: args{prefix: prefix},
+			want: "schism-test/CA-Pubkeys/host-example.com-yCYTo2nP5zUcJuLWlHEJKj0jEElUE2wZvEMuh82UMQM.json",
 		},
 	}
 	for _, tt := range tests {
@@ -39,6 +75,8 @@ func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
 			c := &CAPublicKeyS3Object{
 				CertificateType:    tt.fields.CertificateType,
 				HostCertAuthDomain: tt.fields.HostCertAuthDomain,
+				AuthorizedKey:      tt.fields.AuthorizedKey,
+				KeyFingerprint:     tt.fields.KeyFingerprint,
 			}
 			if got := c.ObjectKey(tt.args.prefix); got != tt.want {
 				t.Errorf("ObjectKey() = %v, want %v", got, tt.want)

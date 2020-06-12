@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -33,6 +34,11 @@ type S3Object interface {
 	// return a full object key for where the object should be saved
 	ObjectKey(prefix string) string
 }
+
+// S3CaPubkeyPrefix The subprefix for storing the Public CA keys
+//   Full Object path will follow this template
+//    {profile.S3Prefix}{S3CaPubkeyPrefix}/{CertType}-{bundle_key_extras}.json
+const S3CaPubkeyPrefix = "CA-Pubkeys/"
 
 // SignedCertificateS3Object represents all the information
 // that will be saved to S3 for a Signed SSH Certificate
@@ -76,6 +82,8 @@ type CAPublicKeyS3Object struct {
 	CertificateType CertType `json:"certificate_type"`
 	// The raw representation of PublicKey after Marshaling to an AuthorizedKey format
 	AuthorizedKey []byte `json:"authorized_key"`
+	// The Fingerprint of the PublicKey as returned by ssh.FingerprintSHA256
+	KeyFingerprint string `json:"fingerprint"`
 	// If this is from a Host CA, the AuthDomain is the domain (or subdomain)
 	// that the Host CA is authorized to sign certificates for
 	//
@@ -88,15 +96,21 @@ type CAPublicKeyS3Object struct {
 // If the HostCertAuthDomain is set, this will be added to the ObjectKey
 //
 //  Format:
-//   {prefix}CA-Certs/{host|user}.json
-//   {prefix}CA-Certs/{host|user}-{HostCertAuthDomain}.json
+//   {prefix}{S3CaPubkeyPrefix}/{host|user}.json
+//   {prefix}{S3CaPubkeyPrefix}/{host|user}-{fingerprint}.json
+//   {prefix}{S3CaPubkeyPrefix}/{host|user}-{HostCertAuthDomain}.json
+//   {prefix}{S3CaPubkeyPrefix}/{host|user}-{HostCertAuthDomain}-{fingerprint}.json
 func (c *CAPublicKeyS3Object) ObjectKey(prefix string) string {
-	objectPrefix := "CA-Certs/"
 	var subKey string
 	if c.HostCertAuthDomain != "" {
 		subKey = fmt.Sprintf("%s-%s", c.CertificateType, c.HostCertAuthDomain)
 	} else {
 		subKey = string(c.CertificateType)
 	}
-	return fmt.Sprintf("%s%s%s.json", prefix, objectPrefix, subKey)
+	if c.KeyFingerprint != "" {
+		// KeyFingerprint is in format "SHA256:{fingerprint}"
+		fingerprint := strings.Split(c.KeyFingerprint, ":")[1]
+		subKey = fmt.Sprintf("%s-%s", subKey, fingerprint)
+	}
+	return fmt.Sprintf("%s%s%s.json", prefix, S3CaPubkeyPrefix, subKey)
 }
