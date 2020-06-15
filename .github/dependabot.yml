@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      # Check for updates Wednesdays at 19:00 PST (03:00 UTC)
+      interval: "weekly"
+      day:      "wednesday"
+      time:     "03:00"
+    open-pull-requests-limit: 10
+    # Bump dep versions in go.sum? Not sure how this will work
+    versioning-strategy: "lockfile-only"
+    allow:
+      - dependency-type: "direct"
+    # This is my project, might as well flat assign them all to myself.
+    assignees:
+      - "agargiulo"
+    reviewers:
+      - "schism-ssh/devops"
