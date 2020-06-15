@@ -8,8 +8,6 @@ updates:
       day:      "wednesday"
       time:     "03:00"
     open-pull-requests-limit: 10
-    # Bump dep versions in go.sum? Not sure how this will work
-    versioning-strategy: "lockfile-only"
     allow:
       - dependency-type: "direct"
     # This is my project, might as well flat assign them all to myself.
