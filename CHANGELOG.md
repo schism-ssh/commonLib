@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2020-06-15
+### Changed
+- [deps] - Update aws-sdk-go@1.32.2
 ## [0.5.0] - 2020-06-12
 ### Added
 - [protocol] - Ability to expand partial `LookupKey`s
