@@ -1,10 +1,11 @@
 package protocol
 
 import (
-	"crypto/sha256"
 	"fmt"
 	"sort"
 	"strings"
+
+	"crypto/sha256"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -35,11 +36,26 @@ func (lk *LookupKey) MarshalJSON() ([]byte, error) {
 	return []byte(lk.String()), nil
 }
 
+// UnmarshalJSON parses the output of `LookupKey.MarshalJSON()`
+// See `LookupKey.String()` for formatting
+//
+// Returns an error if the raw data cannot be parsed
+func (lk *LookupKey) UnmarshalJSON(data []byte) error {
+	id, cType, err := parseRawLookupKey(string(data))
+	if err != nil {
+		return err
+	}
+	lk.Id = id
+	lk.Type = cType
+	return nil
+}
+
 // Expand expands a LookupKey into a full 64-character key,
 // given a partial key that matches a singular certificate bundle of the given type
 // stored in the given S3 bucket (and prefix)
 //
 // Returns an error if there is not a singular match or S3 calls fail.
+// Returns an error if the expanded key is in an invalid format
 //
 //  Example:
 //   sampleKey := protocol.LookupKey{Id: "55e8182e", Type: protocol.HostCertificate}
@@ -61,8 +77,8 @@ func (lk *LookupKey) Expand(s3Svc s3iface.S3API, s3Bucket string, s3Prefix strin
 	case count == 1:
 		expndPrts := strings.Split(*objs.Contents[0].Key, "/")
 		expnd := strings.Split(expndPrts[len(expndPrts)-1], ".")[0]
-		lk.Id, lk.Type = parseRawLookupKey(expnd)
-		return nil
+		lk.Id, lk.Type, err = parseRawLookupKey(expnd)
+		return err
 	default:
 		return fmt.Errorf("partial key '%s' matches zero certificates", lk)
 	}
@@ -73,9 +89,16 @@ func (lk *LookupKey) Expand(s3Svc s3iface.S3API, s3Bucket string, s3Prefix strin
 //
 // Expansion does NOT happen here. See `lk.Expand()`
 // if you wish to resolve a partial key
-func parseRawLookupKey(rawKey string) (string, CertType) {
+func parseRawLookupKey(rawKey string) (string, CertType, error) {
+	var (
+		typeInd = 0
+		idInd   = 1
+	)
 	parts := strings.Split(rawKey, LookupKeySeparator)
-	return parts[0], CertType(parts[1])
+	if len(parts) != 2 {
+		return "", "", fmt.Errorf("unable to parse raw key '%s'", rawKey)
+	}
+	return parts[idInd], CertType(parts[typeInd]), nil
 }
 
 // GenerateLookupKey creates a 64-character long sha256sum key

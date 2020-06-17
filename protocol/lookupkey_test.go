@@ -3,12 +3,13 @@ package protocol_test
 import (
 	"fmt"
 	"reflect"
-	"src.doom.fm/schism/commonLib/protocol"
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+
+	"src.doom.fm/schism/commonLib/protocol"
 )
 
 var (
@@ -32,6 +33,8 @@ func (m *mockS3Client) ListObjectsV2(input *s3.ListObjectsV2Input) (*s3.ListObje
 			{Key: aws.String("user:4e1586bed08190ccac4056078afed44daac058e8361b216dd078c7714b874cae.json")},
 			{Key: aws.String("user:4d5b5d59343254c4fccafe48813ceeb99ae5ce44c1b97113b370a93f8411a01e.json")},
 		}
+	case "host:d0c671a71f190313":
+		contents = []*s3.Object{{Key: aws.String("hosts/d0c671a71f190313333bb79ed1a98fe7414da1089b3740de4ad5056c215512e7.json")}}
 	default:
 		// No matches
 	}
@@ -149,6 +152,18 @@ func TestLookupKey_Expand(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "expanded key is in invalid format",
+			fields: fields{
+				Id:   "d0c671a71f190313",
+				Type: protocol.HostCertificate,
+			},
+			args: args{
+				s3Svc:    &mockS3Client{},
+				s3Bucket: validBucket,
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -204,6 +219,49 @@ func TestLookupKey_MarshalJSON(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("MarshalJSON() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestLookupKey_UnmarshalJSON(t *testing.T) {
+	type args struct {
+		data []byte
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *protocol.LookupKey
+		wantErr bool
+	}{
+		{
+			name: "Raw User LookupKey",
+			args: args{
+				data: []byte("user:a5ba427b532c152b3e9cded5ab36f040072f7582a455271fd26d1fc696c7ac64"),
+			},
+			want: &protocol.LookupKey{
+				Id:   userSomeUserDevKey,
+				Type: protocol.UserCertificate,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Invalid Host LookupKey",
+			args: args{
+				data: []byte("hosts/55e8182ec4413d51676d1ba7480708a48c5b50f4a86b3afb9be6c43c648b373d"),
+			},
+			want:    &protocol.LookupKey{},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lk := &protocol.LookupKey{}
+			if err := lk.UnmarshalJSON(tt.args.data); (err != nil) != tt.wantErr {
+				t.Errorf("UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(lk, tt.want) {
+				t.Errorf("UnmarshalJSON() got = %v, want %v", lk, tt.want)
 			}
 		})
 	}
