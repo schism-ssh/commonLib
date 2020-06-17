@@ -65,14 +65,14 @@ type SignedCertificateS3Object struct {
 	SignedCertificateEncryption map[string]string `json:"signed_certificate_encryption,omitempty"`
 }
 
-// ObjectKey, given a prefix, return a key for S3 by invoking GenerateLookupKey()
-// and adding an `s' to the CertType
+// ObjectKey  given a prefix, return a key for S3 by invoking GenerateLookupKey()
+// and calling .String() on the result
 //
 //  Format:
-//   {prefix}{CertType}s/{LookupKey}.json
+//   {prefix}{LookupKey.String()}.json
 func (c *SignedCertificateS3Object) ObjectKey(prefix string) string {
-	lookupKey := GenerateLookupKey(c.Identity, c.Principals)
-	return fmt.Sprintf("%s%ss/%s.json", prefix, c.CertificateType, lookupKey)
+	lookupKey := GenerateLookupKey(c.Identity, c.Principals, c.CertificateType)
+	return fmt.Sprintf("%s%s.json", prefix, lookupKey)
 }
 
 // CAPublicKeyS3Object represents all the information
