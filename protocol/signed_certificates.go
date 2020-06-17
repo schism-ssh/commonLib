@@ -71,8 +71,8 @@ type SignedCertificateS3Object struct {
 //  Format:
 //   {prefix}{CertType}s/{LookupKey}.json
 func (c *SignedCertificateS3Object) ObjectKey(prefix string) string {
-	lookupKey := GenerateLookupKey(c.Identity, c.Principals)
-	return fmt.Sprintf("%s%ss/%s.json", prefix, c.CertificateType, lookupKey)
+	lookupKey := GenerateLookupKey(c.Identity, c.Principals, c.CertificateType)
+	return fmt.Sprintf("%s%s.json", prefix, lookupKey)
 }
 
 // CAPublicKeyS3Object represents all the information
