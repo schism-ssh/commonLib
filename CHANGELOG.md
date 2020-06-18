@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `LookupKey` is now a struct, not a string
   - Keys now (Un)Marshal in/out of JSON
   - Keys now are formatted with their type and a : before the shasum
+  - Types can be short (`"h:#{partial-key}"`, `"u:#{partial-key}"`)
 
 ## [0.5.1] - 2020-06-15
 ### Changed

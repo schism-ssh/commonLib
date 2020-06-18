@@ -107,10 +107,15 @@ func TestLookupKey_Expand(t *testing.T) {
 		s3Svc:    &mockS3Client{},
 		s3Bucket: validBucket,
 	}
+	validHostLookupKey := &protocol.LookupKey{
+		Id:   hostTestExampleComKey,
+		Type: protocol.HostCertificate,
+	}
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
+		want    *protocol.LookupKey
 		wantErr bool
 	}{
 		{
@@ -120,6 +125,17 @@ func TestLookupKey_Expand(t *testing.T) {
 				Type: protocol.HostCertificate,
 			},
 			args:    validBucketArgs,
+			want:    validHostLookupKey,
+			wantErr: false,
+		},
+		{
+			name: "valid lookup key with short key and type that returns a single result",
+			fields: fields{
+				Id:   "55e8182ec4413d51",
+				Type: "h",
+			},
+			args:    validBucketArgs,
+			want:    validHostLookupKey,
 			wantErr: false,
 		},
 		{
@@ -171,8 +187,14 @@ func TestLookupKey_Expand(t *testing.T) {
 				Id:   tt.fields.Id,
 				Type: tt.fields.Type,
 			}
-			if err := lk.Expand(tt.args.s3Svc, tt.args.s3Bucket, tt.args.s3Prefix); (err != nil) != tt.wantErr {
+			err := lk.Expand(tt.args.s3Svc, tt.args.s3Bucket, tt.args.s3Prefix)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Expand() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr {
+				if !reflect.DeepEqual(lk, tt.want) {
+					t.Errorf("Expand() got = %v, want = %v", lk, tt.want)
+				}
 			}
 		})
 	}
@@ -302,6 +324,64 @@ func TestLookupKey_String(t *testing.T) {
 			}
 			if got := lk.String(); got != tt.want {
 				t.Errorf("String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestParseLookupKey(t *testing.T) {
+	type args struct {
+		rawKey string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *protocol.LookupKey
+		wantErr bool
+	}{
+		{
+			name: "correctly parses host LookupKey",
+			args: args{rawKey: "host:55e8182ec4413d51"},
+			want: &protocol.LookupKey{
+				Id:   "55e8182ec4413d51",
+				Type: protocol.HostCertificate,
+			},
+			wantErr: false,
+		},
+		{
+			name: "correctly parses user LookupKey",
+			args: args{rawKey: "user:a5ba427b532c152b"},
+			want: &protocol.LookupKey{
+				Id:   "a5ba427b532c152b",
+				Type: protocol.UserCertificate,
+			},
+			wantErr: false,
+		},
+		{
+			name: "correctly parses short LookupKey",
+			args: args{rawKey: "h:55e818"},
+			want: &protocol.LookupKey{
+				Id:   "55e818",
+				Type: "h",
+			},
+			wantErr: false,
+		},
+		{
+			name:    "returns an error if the Key is invalid",
+			args:    args{rawKey: "hosts/55e8182ec4413d51"},
+			want:    &protocol.LookupKey{},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := protocol.ParseLookupKey(tt.args.rawKey)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseLookupKey() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ParseLookupKey() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
