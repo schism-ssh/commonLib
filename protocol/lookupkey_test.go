@@ -306,3 +306,61 @@ func TestLookupKey_String(t *testing.T) {
 		})
 	}
 }
+
+func TestParseLookupKey(t *testing.T) {
+	type args struct {
+		rawKey string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *protocol.LookupKey
+		wantErr bool
+	}{
+		{
+			name: "correctly parses host LookupKey",
+			args: args{rawKey: "host:55e8182ec4413d51"},
+			want: &protocol.LookupKey{
+				Id:   "55e8182ec4413d51",
+				Type: protocol.HostCertificate,
+			},
+			wantErr: false,
+		},
+		{
+			name: "correctly parses user LookupKey",
+			args: args{rawKey: "user:a5ba427b532c152b"},
+			want: &protocol.LookupKey{
+				Id:   "a5ba427b532c152b",
+				Type: protocol.UserCertificate,
+			},
+			wantErr: false,
+		},
+		{
+			name: "correctly parses short LookupKey",
+			args: args{rawKey: "h:55e818"},
+			want: &protocol.LookupKey{
+				Id:   "55e818",
+				Type: "h",
+			},
+			wantErr: false,
+		},
+		{
+			name:    "returns an error if the Key is invalid",
+			args:    args{rawKey: "hosts/55e8182ec4413d51"},
+			want:    &protocol.LookupKey{},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := protocol.ParseLookupKey(tt.args.rawKey)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ParseLookupKey() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ParseLookupKey() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -87,8 +87,7 @@ func (lk *LookupKey) Expand(s3Svc s3iface.S3API, s3Bucket string, s3Prefix strin
 // parseRawLookupKey takes a string in the same format that `String()` provides
 // and returns the two sub-components of the Key
 //
-// Expansion does NOT happen here. See `lk.Expand()`
-// if you wish to resolve a partial key
+// Returns an error if the key is improperly formatted
 func parseRawLookupKey(rawKey string) (string, CertType, error) {
 	var (
 		typeInd = 0
@@ -99,6 +98,20 @@ func parseRawLookupKey(rawKey string) (string, CertType, error) {
 		return "", "", fmt.Errorf("unable to parse raw key '%s'", rawKey)
 	}
 	return parts[idInd], CertType(parts[typeInd]), nil
+}
+
+// ParseLookupKey takes a string in the same format that `String()` provides
+// and returns a pointer to a new LookupKey object
+//
+// returns an error if the key is improperly formatted
+//
+// Expansion does NOT happen here. See `lk.Expand()`
+// if you wish to resolve a partial key
+func ParseLookupKey(rawKey string) (*LookupKey, error) {
+	var err error
+	lk := &LookupKey{}
+	lk.Id, lk.Type, err = parseRawLookupKey(rawKey)
+	return lk, err
 }
 
 // GenerateLookupKey creates a 64-character long sha256sum key
