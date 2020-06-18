@@ -107,10 +107,15 @@ func TestLookupKey_Expand(t *testing.T) {
 		s3Svc:    &mockS3Client{},
 		s3Bucket: validBucket,
 	}
+	validHostLookupKey := &protocol.LookupKey{
+		Id:   hostTestExampleComKey,
+		Type: protocol.HostCertificate,
+	}
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
+		want    *protocol.LookupKey
 		wantErr bool
 	}{
 		{
@@ -120,6 +125,7 @@ func TestLookupKey_Expand(t *testing.T) {
 				Type: protocol.HostCertificate,
 			},
 			args:    validBucketArgs,
+			want:    validHostLookupKey,
 			wantErr: false,
 		},
 		{
@@ -171,8 +177,14 @@ func TestLookupKey_Expand(t *testing.T) {
 				Id:   tt.fields.Id,
 				Type: tt.fields.Type,
 			}
-			if err := lk.Expand(tt.args.s3Svc, tt.args.s3Bucket, tt.args.s3Prefix); (err != nil) != tt.wantErr {
+			err := lk.Expand(tt.args.s3Svc, tt.args.s3Bucket, tt.args.s3Prefix)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Expand() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !tt.wantErr {
+				if !reflect.DeepEqual(lk, tt.want) {
+					t.Errorf("Expand() got = %v, want = %v", lk, tt.want)
+				}
 			}
 		})
 	}
