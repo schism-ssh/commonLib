@@ -129,6 +129,16 @@ func TestLookupKey_Expand(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "valid lookup key with short key and type that returns a single result",
+			fields: fields{
+				Id:   "55e8182ec4413d51",
+				Type: "h",
+			},
+			args:    validBucketArgs,
+			want:    validHostLookupKey,
+			wantErr: false,
+		},
+		{
 			name: "valid lookup key that returns multiple keys",
 			fields: fields{
 				Id:   "4",

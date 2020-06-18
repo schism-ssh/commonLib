@@ -167,3 +167,34 @@ func TestCertType_OppositeCA(t *testing.T) {
 		})
 	}
 }
+
+func TestCertType_Expand(t *testing.T) {
+	tests := []struct {
+		name string
+		ct   protocol.CertType
+		want protocol.CertType
+	}{
+		{
+			name: "h yields host",
+			ct:   "h",
+			want: "host",
+		},
+		{
+			name: "u yields user",
+			ct:   "u",
+			want: "user",
+		},
+		{
+			name: "invalid type yields empty string",
+			ct:   "f",
+			want: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.ct.Expand(); got != tt.want {
+				t.Errorf("Expand() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

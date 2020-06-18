@@ -27,6 +27,21 @@ func (ct CertType) OppositeCA() CertType {
 	})[ct]
 }
 
+// Expand returns the full CertType given a single character type
+//  h => host | u => user
+//
+// This is a no-op for already expanded `CertType`s
+func (ct CertType) Expand() CertType {
+	switch ct {
+	case "h", HostCertificate:
+		return HostCertificate
+	case "u", UserCertificate:
+		return UserCertificate
+	default:
+		return ""
+	}
+}
+
 // S3Object provides an interface for saving mostly
 // any struct to S3 as a Marshaled JSON object
 type S3Object interface {

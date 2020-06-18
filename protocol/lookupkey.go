@@ -63,6 +63,9 @@ func (lk *LookupKey) UnmarshalJSON(data []byte) error {
 //   if err != nil { panic(err) }
 //   # sampleKey.Id => "55e8182ec4413d51676d1ba7480708a48c5b50f4a86b3afb9be6c43c648b373d"
 func (lk *LookupKey) Expand(s3Svc s3iface.S3API, s3Bucket string, s3Prefix string) error {
+	// Expand short key types first, even though the data we get back from AWS
+	// \should\ be expanded already. It just makes searching easier
+	lk.Type = lk.Type.Expand()
 	fullPrefix := fmt.Sprintf("%s%s", s3Prefix, lk)
 	objs, err := s3Svc.ListObjectsV2(&s3.ListObjectsV2Input{
 		Bucket: aws.String(s3Bucket),
