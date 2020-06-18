@@ -1,7 +1,9 @@
-package protocol
+package protocol_test
 
 import (
 	"testing"
+
+	"src.doom.fm/schism/commonLib/protocol"
 )
 
 var prefix = "schism-test/"
@@ -10,7 +12,7 @@ func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
 	sampleAuthKey := []byte("ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN6gR4rRcthrCNDgBdOHhJQD/7bS+RTt/+BtUqAZGMEa")
 	kFPrint := "SHA256:yCYTo2nP5zUcJuLWlHEJKj0jEElUE2wZvEMuh82UMQM"
 	type fields struct {
-		CertificateType    CertType
+		CertificateType    protocol.CertType
 		HostCertAuthDomain string
 		AuthorizedKey      []byte
 		KeyFingerprint     string
@@ -26,14 +28,14 @@ func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
 	}{
 		{
 			name:   "User Public CA S3Object Key Without Fingerprint",
-			fields: fields{CertificateType: UserCertificate},
+			fields: fields{CertificateType: protocol.UserCertificate},
 			args:   args{prefix: prefix},
 			want:   "schism-test/CA-Pubkeys/user.json",
 		},
 		{
 			name: "User Public CA S3Object Key With Fingerprint",
 			fields: fields{
-				CertificateType: UserCertificate,
+				CertificateType: protocol.UserCertificate,
 				KeyFingerprint:  kFPrint,
 			},
 			args: args{prefix: prefix},
@@ -42,7 +44,7 @@ func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
 		{
 			name: "Host Public CA S3Object Key Without AuthDomain Without Fingerprint",
 			fields: fields{
-				CertificateType: HostCertificate,
+				CertificateType: protocol.HostCertificate,
 				AuthorizedKey:   sampleAuthKey,
 			},
 			args: args{prefix: prefix},
@@ -51,7 +53,7 @@ func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
 		{
 			name: "Host Public CA S3Object Key With AuthDomain Without Fingerprint",
 			fields: fields{
-				CertificateType:    HostCertificate,
+				CertificateType:    protocol.HostCertificate,
 				HostCertAuthDomain: "example.com",
 				AuthorizedKey:      sampleAuthKey,
 			},
@@ -61,7 +63,7 @@ func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
 		{
 			name: "Host Public CA S3Object Key With AuthDomain With Fingerprint",
 			fields: fields{
-				CertificateType:    HostCertificate,
+				CertificateType:    protocol.HostCertificate,
 				HostCertAuthDomain: "example.com",
 				AuthorizedKey:      sampleAuthKey,
 				KeyFingerprint:     kFPrint,
@@ -72,7 +74,7 @@ func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &CAPublicKeyS3Object{
+			c := &protocol.CAPublicKeyS3Object{
 				CertificateType:    tt.fields.CertificateType,
 				HostCertAuthDomain: tt.fields.HostCertAuthDomain,
 				AuthorizedKey:      tt.fields.AuthorizedKey,
@@ -87,7 +89,7 @@ func TestCAPublicKeyS3Object_ObjectKey(t *testing.T) {
 
 func TestSignedCertificateS3Object_ObjectKey(t *testing.T) {
 	type fields struct {
-		CertificateType CertType
+		CertificateType protocol.CertType
 		Identity        string
 		Principals      []string
 	}
@@ -103,7 +105,7 @@ func TestSignedCertificateS3Object_ObjectKey(t *testing.T) {
 		{
 			name: "HostSignedCertS3Object",
 			fields: fields{
-				CertificateType: HostCertificate,
+				CertificateType: protocol.HostCertificate,
 				Identity:        "test.example.com",
 				Principals:      []string{"test.example.com"},
 			},
@@ -113,7 +115,7 @@ func TestSignedCertificateS3Object_ObjectKey(t *testing.T) {
 		{
 			name: "UserSignedCertS3Object",
 			fields: fields{
-				CertificateType: UserCertificate,
+				CertificateType: protocol.UserCertificate,
 				Identity:        "user@test.example.com",
 				Principals:      []string{"user", "admin"},
 			},
@@ -123,7 +125,7 @@ func TestSignedCertificateS3Object_ObjectKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &SignedCertificateS3Object{
+			c := &protocol.SignedCertificateS3Object{
 				CertificateType: tt.fields.CertificateType,
 				Identity:        tt.fields.Identity,
 				Principals:      tt.fields.Principals,
@@ -138,18 +140,23 @@ func TestSignedCertificateS3Object_ObjectKey(t *testing.T) {
 func TestCertType_OppositeCA(t *testing.T) {
 	tests := []struct {
 		name string
-		ct   CertType
-		want CertType
+		ct   protocol.CertType
+		want protocol.CertType
 	}{
 		{
 			name: "Host yields User",
-			ct:   UserCertificate,
-			want: HostCertificate,
+			ct:   protocol.UserCertificate,
+			want: protocol.HostCertificate,
 		},
 		{
 			name: "User yields Host",
-			ct:   HostCertificate,
-			want: UserCertificate,
+			ct:   protocol.HostCertificate,
+			want: protocol.UserCertificate,
+		},
+		{
+			name: "Invalid Type yields empty string",
+			ct:   "admin",
+			want: "",
 		},
 	}
 	for _, tt := range tests {
