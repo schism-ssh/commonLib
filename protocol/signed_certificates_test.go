@@ -176,18 +176,21 @@ func TestCertType_Expand(t *testing.T) {
 	}{
 		{
 			name: "h yields host",
-			ct:   "h",
-			want: "host",
+			ct:   "h", want: "host",
 		},
 		{
-			name: "u yields user",
-			ct:   "u",
-			want: "user",
+			name: "u yields user", ct: "u", want: "user"},
+		{
+			name: "c yields cakp",
+			ct:   "c", want: "cakp",
+		},
+		{
+			name: "expanded type yields itself",
+			ct:   "host", want: "host",
 		},
 		{
 			name: "invalid type yields empty string",
-			ct:   "f",
-			want: "",
+			ct:   "f", want: "",
 		},
 	}
 	for _, tt := range tests {

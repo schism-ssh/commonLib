@@ -17,6 +17,9 @@ const (
 	HostCertificate CertType = "host"
 	// Authenticates users to servers
 	UserCertificate CertType = "user"
+	// Used in `schism list -ca` primarily but maybe I'll find more places this is useful
+	// cakp ~> CertAuthority KeyPair
+	CaKeyPair CertType = "cakp"
 )
 
 // OppositeCA returns "host" for "user" and "user" for "host"
@@ -37,6 +40,8 @@ func (ct CertType) Expand() CertType {
 		return HostCertificate
 	case "u", UserCertificate:
 		return UserCertificate
+	case "c", CaKeyPair:
+		return CaKeyPair
 	default:
 		return ""
 	}
