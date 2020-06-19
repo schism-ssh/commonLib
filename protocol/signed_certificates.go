@@ -55,6 +55,11 @@ type S3Object interface {
 //    {profile.S3Prefix}{S3CaPubkeyPrefix}/{CertType}-{bundle_key_extras}.json
 const S3CaPubkeyPrefix = "CA-Pubkeys/"
 
+// S3CertStoragePrefix The subprefix for storing the Signed Certificate
+//   Full Object path will follow this template
+//    {profile.S3Prefix}{S3CertStoragePrefix}{LookupKey}.json
+const S3CertStoragePrefix = "Signed-Certs/"
+
 // SignedCertificateS3Object represents all the information
 // that will be saved to S3 for a Signed SSH Certificate
 type SignedCertificateS3Object struct {
@@ -87,7 +92,7 @@ type SignedCertificateS3Object struct {
 //   {prefix}{LookupKey.String()}.json
 func (c *SignedCertificateS3Object) ObjectKey(prefix string) string {
 	lookupKey := GenerateLookupKey(c.Identity, c.Principals, c.CertificateType)
-	return fmt.Sprintf("%s%s.json", prefix, lookupKey)
+	return fmt.Sprintf("%s%s%s.json", prefix, S3CertStoragePrefix, lookupKey)
 }
 
 // CAPublicKeyS3Object represents all the information

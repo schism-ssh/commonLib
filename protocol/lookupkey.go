@@ -66,7 +66,7 @@ func (lk *LookupKey) Expand(s3Svc s3iface.S3API, s3Bucket string, s3Prefix strin
 	// Expand short key types first, even though the data we get back from AWS
 	// \should\ be expanded already. It just makes searching easier
 	lk.Type = lk.Type.Expand()
-	fullPrefix := fmt.Sprintf("%s%s", s3Prefix, lk)
+	fullPrefix := fmt.Sprintf("%s%s%s", s3Prefix, S3CertStoragePrefix, lk)
 	objs, err := s3Svc.ListObjectsV2(&s3.ListObjectsV2Input{
 		Bucket: aws.String(s3Bucket),
 		Prefix: aws.String(fullPrefix),

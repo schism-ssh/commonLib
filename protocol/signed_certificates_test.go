@@ -110,7 +110,7 @@ func TestSignedCertificateS3Object_ObjectKey(t *testing.T) {
 				Principals:      []string{"test.example.com"},
 			},
 			args: args{prefix: prefix},
-			want: "schism-test/host:55e8182ec4413d51676d1ba7480708a48c5b50f4a86b3afb9be6c43c648b373d.json",
+			want: "schism-test/Signed-Certs/host:55e8182ec4413d51676d1ba7480708a48c5b50f4a86b3afb9be6c43c648b373d.json",
 		},
 		{
 			name: "UserSignedCertS3Object",
@@ -120,7 +120,7 @@ func TestSignedCertificateS3Object_ObjectKey(t *testing.T) {
 				Principals:      []string{"user", "admin"},
 			},
 			args: args{prefix: prefix},
-			want: "schism-test/user:69206403b2f940935765c084335bcd2d9caed2fbd86a7056ddab98ce698e4ce1.json",
+			want: "schism-test/Signed-Certs/user:69206403b2f940935765c084335bcd2d9caed2fbd86a7056ddab98ce698e4ce1.json",
 		},
 	}
 	for _, tt := range tests {

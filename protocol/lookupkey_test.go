@@ -26,14 +26,14 @@ func (m *mockS3Client) ListObjectsV2(input *s3.ListObjectsV2Input) (*s3.ListObje
 	output := &s3.ListObjectsV2Output{}
 	var contents []*s3.Object
 	switch *input.Prefix {
-	case "host:55e8182ec4413d51":
+	case "Signed-Certs/host:55e8182ec4413d51":
 		contents = []*s3.Object{{Key: aws.String("host:55e8182ec4413d51676d1ba7480708a48c5b50f4a86b3afb9be6c43c648b373d.json")}}
-	case "user:4":
+	case "Signed-Certs/user:4":
 		contents = []*s3.Object{
 			{Key: aws.String("user:4e1586bed08190ccac4056078afed44daac058e8361b216dd078c7714b874cae.json")},
 			{Key: aws.String("user:4d5b5d59343254c4fccafe48813ceeb99ae5ce44c1b97113b370a93f8411a01e.json")},
 		}
-	case "host:d0c671a71f190313":
+	case "Signed-Certs/host:d0c671a71f190313":
 		contents = []*s3.Object{{Key: aws.String("hosts/d0c671a71f190313333bb79ed1a98fe7414da1089b3740de4ad5056c215512e7.json")}}
 	default:
 		// No matches
