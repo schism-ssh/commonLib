@@ -4,6 +4,13 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"encoding/json"
+	"io/ioutil"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 )
 
 // CertType: Schism supports two types of certificates: "user" and "host"
@@ -53,6 +60,24 @@ type S3Object interface {
 	// ObjectKey should take a prefix and
 	// return a full object key for where the object should be saved
 	ObjectKey(prefix string) string
+
+	// LoadObject takes an S3 connection, S3 Bucket, and S3 ObjectKey
+	// and populates the wantFields of the struct with the saved S3 object's data
+	LoadObject(s3Svc s3iface.S3API, s3Bucket string, s3ObjectKey string) error
+}
+
+// rawLoadS3Object takes a bucket and key and returns the raw bytes.
+// an error is returned if s3 has issues or if the object body cannot be read for some reason
+func rawLoadS3Object(s3Svc s3iface.S3API, s3Bucket string, s3ObjectKey string) ([]byte, error) {
+	object, err := s3Svc.GetObject(&s3.GetObjectInput{
+		Bucket: aws.String(s3Bucket),
+		Key:    aws.String(s3ObjectKey),
+	})
+	if err != nil {
+		return nil, err
+	}
+	body, _ := ioutil.ReadAll(object.Body)
+	return body, err
 }
 
 // S3CaPubkeyPrefix The subprefix for storing the Public CA keys
@@ -100,6 +125,18 @@ func (c *SignedCertificateS3Object) ObjectKey(prefix string) string {
 	return fmt.Sprintf("%s%s%s.json", prefix, S3CertStoragePrefix, lookupKey)
 }
 
+// LoadObject loads an object from the given s3://{s3Bucket}/{s3ObjectKey} and un-marshals it into a SignedCertificateS3Object
+func (c *SignedCertificateS3Object) LoadObject(s3Svc s3iface.S3API, s3Bucket string, s3ObjectKey string) error {
+	body, err := rawLoadS3Object(s3Svc, s3Bucket, s3ObjectKey)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(body, c); err != nil {
+		return fmt.Errorf("unable to unmarshal object (%s): %w", s3ObjectKey, err)
+	}
+	return nil
+}
+
 // CAPublicKeyS3Object represents all the information
 // that will be saved to S3 for a given CA PublicKey
 type CAPublicKeyS3Object struct {
@@ -138,4 +175,16 @@ func (c *CAPublicKeyS3Object) ObjectKey(prefix string) string {
 		subKey = fmt.Sprintf("%s-%s", subKey, fingerprint)
 	}
 	return fmt.Sprintf("%s%s%s.json", prefix, S3CaPubkeyPrefix, subKey)
+}
+
+// LoadObject loads an object from the given s3://{s3Bucket}/{s3ObjectKey} and un-marshals it into a CAPublicKeyS3Object
+func (c *CAPublicKeyS3Object) LoadObject(s3Svc s3iface.S3API, s3Bucket string, s3ObjectKey string) error {
+	body, err := rawLoadS3Object(s3Svc, s3Bucket, s3ObjectKey)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(body, c); err != nil {
+		return fmt.Errorf("unable to unmarshal object (%s): %w", s3ObjectKey, err)
+	}
+	return nil
 }

@@ -5,6 +5,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
+	"io/ioutil"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -41,4 +44,28 @@ func (m *MockS3Client) ListObjectsV2(input *s3.ListObjectsV2Input) (*s3.ListObje
 	output.SetContents(contents)
 	output.SetKeyCount(int64(len(contents)))
 	return output, nil
+}
+
+func (m *MockS3Client) GetObject(input *s3.GetObjectInput) (*s3.GetObjectOutput, error) {
+	output := &s3.GetObjectOutput{}
+	var body string
+	if strings.HasPrefix(*input.Key, S3CaPubkeyPrefix) {
+		body = HelperLoadString(m.T, "valid_ca_pubkey_s3_body.json")
+		// CA Pubkey Request
+	} else if strings.HasPrefix(*input.Key, S3CertStoragePrefix) {
+		body = HelperLoadString(m.T, "valid_signed_cert_s3_body.json")
+	} else if strings.HasPrefix(*input.Key, "empty-objects") {
+		body = ""
+	} else {
+		return nil, fmt.Errorf("error loading object %s", *input.Key)
+	}
+	output.SetBody(ioutil.NopCloser(strings.NewReader(body)))
+	return output, nil
+}
+
+func HelperLoadString(t *testing.T, name string) string {
+	t.Helper()
+	path := filepath.Join("testdata", name)
+	bytes, _ := ioutil.ReadFile(path)
+	return string(bytes)
 }
