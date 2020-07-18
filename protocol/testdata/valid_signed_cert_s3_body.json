@@ -1,0 +1,8 @@
+{
+  "certificate_type": "host",
+  "identity": "test.example.com",
+  "certificate_principals": [
+    "test.example.com"
+  ],
+  "validity_interval": 432000000000000
+}
