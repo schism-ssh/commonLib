@@ -2,4 +2,4 @@ module src.doom.fm/schism/commonLib
 
 go 1.14
 
-require github.com/aws/aws-sdk-go v1.33.7
+require github.com/aws/aws-sdk-go v1.37.22
