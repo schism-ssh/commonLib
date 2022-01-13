@@ -32,10 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - [protocol] - `CAPublicKeyS3Object` now supports `KeyFingerprint`
 
-[protocol]: <https://src.doom.fm/schism/commonLib/-/tree/v0.6.0-dev/protocol>
-[deps]:<https://src.doom.fm/schism/commonLib/-/blob/v0.6.0-dev/go.mod>
+[protocol]: <https://code.agarg.me/schism/commonLib/-/tree/v0.6.0-dev/protocol>
+[deps]:<https://code.agarg.me/schism/commonLib/-/blob/v0.6.0-dev/go.mod>
 
-[0.5.0]:<https://src.doom.fm/schism/commonLib/-/tags/v0.5.0>
-[0.5.1]:<https://src.doom.fm/schism/commonLib/-/tags/v0.5.1>
-[0.6.0]:<https://src.doom.fm/schism/commonLib/-/tags/v0.6.0>
-[Unreleased]:<https://src.doom.fm/schism/commonLib/-/compare/v0.5.1...v0.6.0-dev>
+[0.5.0]:<https://code.agarg.me/schism/commonLib/-/tags/v0.5.0>
+[0.5.1]:<https://code.agarg.me/schism/commonLib/-/tags/v0.5.1>
+[0.6.0]:<https://code.agarg.me/schism/commonLib/-/tags/v0.6.0>
+[Unreleased]:<https://code.agarg.me/schism/commonLib/-/compare/v0.5.1...v0.6.0-dev>
