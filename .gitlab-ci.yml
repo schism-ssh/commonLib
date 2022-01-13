@@ -1,7 +1,7 @@
 default:
-  image: img.doom.fm/build/golang:latest-1.14.2-buster
+  image: reg.agarg.me/build/golang:latest-1.17.6-bullseye
   tags:
-    - shared-exec-docker
+    - agarg-public-projects
 
 stages:
   - pre-flight
@@ -12,7 +12,9 @@ go-fmt-vet:
   before_script:
     - go mod vendor
   script:
-    - go fmt ./...
+    - fmt_output=$(find -name vendor -prune -o -type f -name '*.go' -print0 | xargs -0 gofmt -l)
+    - echo "${fmt_output}"
+    - test -z "${fmt_output}"
     - go vet ./...
   artifacts:
     expire_in: 1 hour

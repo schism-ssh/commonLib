@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 
-	"src.doom.fm/schism/commonLib/protocol"
+	"code.agarg.me/schism/commonLib/protocol"
 )
 
 var prefix = "schism-test/"
