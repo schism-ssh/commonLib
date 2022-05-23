@@ -10,6 +10,7 @@ stages:
 go-fmt-vet:
   stage: pre-flight
   before_script:
+    - go get
     - go mod vendor
   script:
     - fmt_output=$(find -name vendor -prune -o -type f -name '*.go' -print0 | xargs -0 gofmt -l)

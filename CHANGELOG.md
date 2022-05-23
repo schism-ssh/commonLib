@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - [deps] - Update aws sdk
 - go v1.18
+### Fixed
+- [ci] `go mod vendor` needs `go get` first
 
 ## [0.6.2]  - 2022-01-13
 ### Changed
@@ -48,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [protocol]: <https://code.agarg.me/schism/commonLib/-/tree/main/protocol>
 [deps]:<https://code.agarg.me/schism/commonLib/-/blob/main/go.mod>
+[ci]:<https://code.agarg.me/schism/commonLib/-/blob/main/.gitlab-ci.yml>
 
 [0.5.0]:<https://code.agarg.me/schism/commonLib/-/tags/v0.5.0>
 [0.5.1]:<https://code.agarg.me/schism/commonLib/-/tags/v0.5.1>
@@ -55,3 +58,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.6.1]:<https://code.agarg.me/schism/commonLib/-/tags/v0.6.1>
 [0.6.2]:<https://code.agarg.me/schism/commonLib/-/tags/v0.6.2>
 [0.6.3]:<https://code.agarg.me/schism/commonLib/-/tags/v0.6.3>
+[0.6.4]:<https://code.agarg.me/schism/commonLib/-/tags/v0.6.4>
