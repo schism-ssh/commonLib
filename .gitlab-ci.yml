@@ -1,5 +1,5 @@
 default:
-  image: reg.agarg.me/build/golang:latest-1.17.6-bullseye
+  image: reg.agarg.me/build/golang:latest-1.18.2-bullseye
   tags:
     - agarg-public-projects
 
